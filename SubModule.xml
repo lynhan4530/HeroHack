@@ -10,6 +10,8 @@
     <DependedModule Id="Sandbox"/>
     <DependedModule Id="CustomBattle"/>
     <DependedModule Id="StoryMode"/>
+    <!-- Harmony Workshop mod (ID 2859188632) — CORRECT Id is "Bannerlord.Harmony" -->
+    <DependedModule Id="Bannerlord.Harmony"/>
   </DependedModules>
   <SubModules>
     <SubModule>

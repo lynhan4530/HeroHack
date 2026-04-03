@@ -1,0 +1,18 @@
+<Prefab>
+  <Window>
+    <!-- Persistent HUD button anchored to top-right of the screen -->
+    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                  SuggestedWidth="55" SuggestedHeight="40"
+                  HorizontalAlignment="Right" VerticalAlignment="Top"
+                  MarginRight="12" MarginTop="10"
+                  Command.Click="ExecuteTogglePanel"
+                  DoNotPassEventsToChildren="true"
+                  Brush="ButtonBrush2">
+      <Children>
+        <TextWidget Text="HH"
+                    WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Children>
+    </ButtonWidget>
+  </Window>
+</Prefab>
