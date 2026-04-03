@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using TaleWorlds.Engine.GauntletUI;
 
 namespace HeroHack.UI
@@ -8,10 +10,27 @@ namespace HeroHack.UI
 
         public bool IsOpen => _panelVM.IsOpen;
 
+        private static readonly string DebugLog = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            "HeroHack", "debug.txt");
+
+        private static void D(string msg)
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(DebugLog)!);
+                File.AppendAllText(DebugLog, $"[{DateTime.Now:HH:mm:ss.fff}] {msg}\n");
+            }
+            catch { }
+        }
+
         public HeroHackLayer() : base("GauntletLayer", 200)
         {
+            D("HeroHackLayer ctor start");
             _panelVM = new HeroHackPanelVM();
+            D("PanelVM created OK");
             LoadMovie("HeroHackPanel", _panelVM);
+            D("LoadMovie returned OK");
         }
 
         public void TogglePanel()

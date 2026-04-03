@@ -1,27 +1,25 @@
-<Prefab>
+﻿<Prefab>
   <Window>
-    <!-- Covers full screen; only visible when panel is open -->
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsOpen">
       <Children>
 
-        <!-- Dark click-blocker backdrop -->
+        <!-- Dark backdrop -->
         <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                 Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.55" />
 
-        <!-- Main panel box (900 x 700, centred) -->
+        <!-- Main panel -->
         <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                SuggestedWidth="900" SuggestedHeight="700"
+                SuggestedWidth="900" SuggestedHeight="840"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Sprite="BlankWhiteSquare_9" Color="#111827FF" AlphaFactor="0.98">
           <Children>
 
-            <!-- Vertical layout inside the panel -->
             <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                        StackLayout.LayoutMethod="VerticalTopToBottom">
               <Children>
 
-                <!-- ── Header (50 px) ─────────────────────────────────── -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50"
+                <!-- Header 45px -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="45"
                         Sprite="BlankWhiteSquare_9" Color="#1E3A5FFF" AlphaFactor="1">
                   <Children>
                     <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
@@ -44,39 +42,39 @@
                   </Children>
                 </Widget>
 
-                <!-- ── Tab bar (45 px) ───────────────────────────────── -->
-                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="45"
+                <!-- Tab bar 40px -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40"
                            StackLayout.LayoutMethod="HorizontalLeftToRight"
                            Sprite="BlankWhiteSquare_9" Color="#0F172AFF" AlphaFactor="1">
                   <Children>
                     <ButtonWidget Text="Hero"
                                   WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="38"
-                                  VerticalAlignment="Center" MarginLeft="5" MarginTop="4"
+                                  SuggestedWidth="200" SuggestedHeight="36"
+                                  VerticalAlignment="Center" MarginLeft="5" MarginTop="2"
                                   Command.Click="ExecuteSelectTab0"
                                   IsSelected="@IsTab0Active"
                                   ButtonType="Toggle"
                                   Brush="ButtonBrush2" />
                     <ButtonWidget Text="Party"
                                   WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="38"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="4"
+                                  SuggestedWidth="200" SuggestedHeight="36"
+                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
                                   Command.Click="ExecuteSelectTab1"
                                   IsSelected="@IsTab1Active"
                                   ButtonType="Toggle"
                                   Brush="ButtonBrush2" />
                     <ButtonWidget Text="Settlement"
                                   WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="38"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="4"
+                                  SuggestedWidth="200" SuggestedHeight="36"
+                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
                                   Command.Click="ExecuteSelectTab2"
                                   IsSelected="@IsTab2Active"
                                   ButtonType="Toggle"
                                   Brush="ButtonBrush2" />
                     <ButtonWidget Text="Export / Import"
                                   WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="38"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="4"
+                                  SuggestedWidth="200" SuggestedHeight="36"
+                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
                                   Command.Click="ExecuteSelectTab3"
                                   IsSelected="@IsTab3Active"
                                   ButtonType="Toggle"
@@ -84,17 +82,36 @@
                   </Children>
                 </ListPanel>
 
-                <!-- ── Content area (575 px) — tabs overlap/hide ──────── -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="575">
+                <!-- Content area 720px -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="720">
                   <Children>
 
-                    <!-- Hero tab placeholder -->
+                    <!-- STEP 1: Hero tab - minimal, only TextWidgets, sub-VM DataSource active -->
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            IsVisible="@IsTab0Active">
+                            IsVisible="@IsTab0Active" DataSource="{HeroTab}">
                       <Children>
-                        <TextWidget Text="Hero Tab — implemented in Phase 2"
-                                    WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   StackLayout.LayoutMethod="VerticalTopToBottom"
+                                   MarginLeft="12" MarginRight="12" MarginTop="8">
+                          <Children>
+                            <TextWidget Text="[DEBUG STEP 1] Sub-VM binding active"
+                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                        MarginBottom="6" />
+                            <TextWidget Text="@SelectedHeroName"
+                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                        MarginBottom="6" />
+                            <TextWidget Text="Gold:"
+                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" />
+                            <TextWidget Text="@GoldText"
+                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" />
+                            <ButtonWidget Text="Apply Gold (test)"
+                                          WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                          SuggestedWidth="160" SuggestedHeight="28"
+                                          Brush="ButtonBrush2"
+                                          Command.Click="ExecuteApplyGold"
+                                          DoNotPassEventsToChildren="true" />
+                          </Children>
+                        </ListPanel>
                       </Children>
                     </Widget>
 
@@ -102,7 +119,7 @@
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                             IsVisible="@IsTab1Active">
                       <Children>
-                        <TextWidget Text="Party Tab — implemented in Phase 4"
+                        <TextWidget Text="Party Tab - Phase 4"
                                     WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
@@ -112,7 +129,7 @@
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                             IsVisible="@IsTab2Active">
                       <Children>
-                        <TextWidget Text="Settlement Tab — implemented in Phase 4"
+                        <TextWidget Text="Settlement Tab - Phase 4"
                                     WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
@@ -122,7 +139,7 @@
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                             IsVisible="@IsTab3Active">
                       <Children>
-                        <TextWidget Text="Export / Import Tab — implemented in Phase 5"
+                        <TextWidget Text="Export / Import Tab - Phase 5"
                                     WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
@@ -131,8 +148,8 @@
                   </Children>
                 </Widget>
 
-                <!-- ── Status bar (30 px) ────────────────────────────── -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                <!-- Status bar 35px -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="35"
                         Sprite="BlankWhiteSquare_9" Color="#0F172AFF" AlphaFactor="1">
                   <Children>
                     <TextWidget Text="@StatusMessage"

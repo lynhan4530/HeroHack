@@ -8,10 +8,12 @@ namespace HeroHack.UI
         private int _activeTabIndex;
         private string _statusMessage = string.Empty;
         private float _statusTimer;
+        private HeroTabVM _heroTab = null!;
 
         public HeroHackPanelVM()
         {
             _activeTabIndex = 0;
+            HeroTab = new HeroTabVM(SetStatus);
         }
 
         [DataSourceProperty]
@@ -57,6 +59,20 @@ namespace HeroHack.UI
 
         [DataSourceProperty]
         public bool IsTab3Active => _activeTabIndex == 3;
+
+        [DataSourceProperty]
+        public HeroTabVM HeroTab
+        {
+            get => _heroTab;
+            set
+            {
+                if (_heroTab != value)
+                {
+                    _heroTab = value;
+                    OnPropertyChangedWithValue(value, nameof(HeroTab));
+                }
+            }
+        }
 
         [DataSourceProperty]
         public string StatusMessage
