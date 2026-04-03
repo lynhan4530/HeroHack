@@ -1,0 +1,22 @@
+# Bannerlord Mod Gitignore
+
+# Build results
+/bin/
+/obj/
+/Properties/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Game DLLs (should not be in repo)
+TaleWorlds.*.dll
+DotNet.*.dll
+Newtonsoft.Json.dll
+
+# OS files
+Thumbs.db
+.DS_Store
