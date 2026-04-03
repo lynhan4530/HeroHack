@@ -56,6 +56,8 @@ namespace HeroHack.UI
 
         // ── Hero info display ─────────────────────────────────────────────────
         private string _selectedHeroName = "None";
+        private int _currentHeroIndex = 0;
+        private string _heroCountText = "1 / 1";
 
         public HeroTabVM(Action<string> onStatusUpdate)
         {
@@ -95,6 +97,20 @@ namespace HeroHack.UI
             }
         }
 
+        [DataSourceProperty]
+        public string HeroCountText
+        {
+            get => _heroCountText;
+            set
+            {
+                if (_heroCountText != value)
+                {
+                    _heroCountText = value;
+                    OnPropertyChangedWithValue(value, nameof(HeroCountText));
+                }
+            }
+        }
+
         private void OnHeroSelected(HeroSelectorItemVM item)
         {
             if (_selectedHero != null)
@@ -103,12 +119,29 @@ namespace HeroHack.UI
             _selectedHero.IsSelected = true;
             SelectedHeroName = item.Name;
             RefreshStatsFromHero(item.Hero);
+            int idx = _availableHeroes.IndexOf(item);
+            if (idx >= 0) _currentHeroIndex = idx;
+            HeroCountText = $"{_currentHeroIndex + 1} / {_availableHeroes.Count}";
         }
 
         public void ExecuteRefreshHeroes()
         {
             RefreshHeroList();
             _onStatusUpdate("Hero list refreshed.");
+        }
+
+        public void ExecutePrevHero()
+        {
+            if (_availableHeroes.Count == 0) return;
+            _currentHeroIndex = (_currentHeroIndex - 1 + _availableHeroes.Count) % _availableHeroes.Count;
+            OnHeroSelected(_availableHeroes[_currentHeroIndex]);
+        }
+
+        public void ExecuteNextHero()
+        {
+            if (_availableHeroes.Count == 0) return;
+            _currentHeroIndex = (_currentHeroIndex + 1) % _availableHeroes.Count;
+            OnHeroSelected(_availableHeroes[_currentHeroIndex]);
         }
 
         private void RefreshHeroList()
@@ -135,6 +168,7 @@ namespace HeroHack.UI
             }
 
             // Auto-select player hero
+            _currentHeroIndex = 0;
             if (_availableHeroes.Count > 0)
                 OnHeroSelected(_availableHeroes[0]);
 
@@ -143,7 +177,7 @@ namespace HeroHack.UI
 
         private void RefreshStatsFromHero(Hero hero)
         {
-            GoldText = hero.Gold.ToString();
+            GoldText = hero.Gold.ToString("N0");
             RenownText = ((int)(hero.Clan?.Renown ?? 0f)).ToString();
             InfluenceText = Clan.PlayerClan != null ? ((int)Clan.PlayerClan.Influence).ToString() : "0";
             HeroLevelText = hero.CharacterObject?.Level.ToString() ?? "1";
@@ -211,11 +245,11 @@ namespace HeroHack.UI
         {
             Hero? hero = _selectedHero?.Hero;
             if (hero == null) { _onStatusUpdate("No hero selected."); return; }
-            if (!int.TryParse(_goldText, out int val)) { _onStatusUpdate("Invalid gold value."); return; }
+            if (!int.TryParse(_goldText.Replace(",", ""), out int val)) { _onStatusUpdate("Invalid gold value."); return; }
             val = Math.Max(0, Math.Min(9_999_999, val));
             HeroCheats.SetGold(hero, val);
             _onStatusUpdate($"Gold set to {val:N0} for {hero.Name}.");
-            GoldText = hero.Gold.ToString();
+            GoldText = hero.Gold.ToString("N0");
         }
 
         public void ExecuteApplyRenown()
@@ -322,13 +356,41 @@ namespace HeroHack.UI
         [DataSourceProperty] public string SkillMedicineText { get => _skillMedicineText; set { if (_skillMedicineText != value) { _skillMedicineText = value; OnPropertyChangedWithValue(value, nameof(SkillMedicineText)); } } }
         [DataSourceProperty] public string SkillEngineeringText { get => _skillEngineeringText; set { if (_skillEngineeringText != value) { _skillEngineeringText = value; OnPropertyChangedWithValue(value, nameof(SkillEngineeringText)); } } }
 
-        public void ExecuteMaxAllSkills()
+        public void ExecuteApplySkills()
         {
             Hero? hero = _selectedHero?.Hero;
             if (hero == null) { _onStatusUpdate("No hero selected."); return; }
-            HeroCheats.MaxAllSkills(hero);
-            RefreshStatsFromHero(hero);
-            _onStatusUpdate($"All skills maxed (330) for {hero.Name}.");
+
+            bool ok = true;
+            ok &= TrySetSkill(hero, DefaultSkills.OneHanded, _skillOneHandedText);
+            ok &= TrySetSkill(hero, DefaultSkills.TwoHanded, _skillTwoHandedText);
+            ok &= TrySetSkill(hero, DefaultSkills.Polearm, _skillPolearmText);
+            ok &= TrySetSkill(hero, DefaultSkills.Bow, _skillBowText);
+            ok &= TrySetSkill(hero, DefaultSkills.Crossbow, _skillCrossbowText);
+            ok &= TrySetSkill(hero, DefaultSkills.Throwing, _skillThrowingText);
+            ok &= TrySetSkill(hero, DefaultSkills.Riding, _skillRidingText);
+            ok &= TrySetSkill(hero, DefaultSkills.Athletics, _skillAthleticsText);
+            ok &= TrySetSkill(hero, DefaultSkills.Crafting, _skillCraftingText);
+            ok &= TrySetSkill(hero, DefaultSkills.Scouting, _skillScoutingText);
+            ok &= TrySetSkill(hero, DefaultSkills.Tactics, _skillTacticsText);
+            ok &= TrySetSkill(hero, DefaultSkills.Roguery, _skillRogueryText);
+            ok &= TrySetSkill(hero, DefaultSkills.Charm, _skillCharmText);
+            ok &= TrySetSkill(hero, DefaultSkills.Leadership, _skillLeadershipText);
+            ok &= TrySetSkill(hero, DefaultSkills.Trade, _skillTradeText);
+            ok &= TrySetSkill(hero, DefaultSkills.Steward, _skillStewardText);
+            ok &= TrySetSkill(hero, DefaultSkills.Medicine, _skillMedicineText);
+            ok &= TrySetSkill(hero, DefaultSkills.Engineering, _skillEngineeringText);
+
+            _onStatusUpdate(ok
+                ? $"Skills applied to {hero.Name}."
+                : "Some skill values were invalid — check inputs.");
+        }
+
+        private bool TrySetSkill(Hero hero, SkillObject skill, string text)
+        {
+            if (!int.TryParse(text, out int val)) return false;
+            HeroCheats.SetSkill(hero, skill, val);
+            return true;
         }
 
         // =====================================================================

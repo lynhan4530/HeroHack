@@ -3,144 +3,357 @@
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsOpen">
       <Children>
 
-        <!-- Dark backdrop -->
+        <!-- Full-screen opaque backdrop — kills PAUSED/map bleed-through -->
         <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.55" />
+                Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.82" />
 
-        <!-- Main panel -->
+        <!-- Main panel: 920 x 1010, fully opaque, centred -->
         <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                SuggestedWidth="900" SuggestedHeight="840"
+                SuggestedWidth="920" SuggestedHeight="1010"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                Sprite="BlankWhiteSquare_9" Color="#111827FF" AlphaFactor="0.98">
+                Sprite="BlankWhiteSquare_9" Color="#0D1117FF" AlphaFactor="1.0">
           <Children>
 
+            <!-- Floating X close button (above everything) -->
+            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                          SuggestedWidth="34" SuggestedHeight="30"
+                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                          MarginRight="6" MarginTop="6"
+                          Command.Click="ExecuteClose"
+                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+              <Children>
+                <TextWidget Text="X" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+              </Children>
+            </ButtonWidget>
+
+            <!--
+              =============================================================
+              OUTER STACK — all children Fixed height → guaranteed top-down
+              order. Content is FIRST child = TOP. Tabs are LAST = BOTTOM.
+              927 + 28 + 55 = 1010 px (exact panel height).
+              =============================================================
+            -->
             <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                       StackLayout.LayoutMethod="VerticalTopToBottom">
+                       StackLayout.LayoutMethod="VerticalBottomToTop">
               <Children>
 
-                <!-- Header 45px -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="45"
-                        Sprite="BlankWhiteSquare_9" Color="#1E3A5FFF" AlphaFactor="1">
-                  <Children>
-                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                Text="HeroHack v1.0"
-                                HorizontalAlignment="Left" VerticalAlignment="Center"
-                                MarginLeft="15" />
-                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="36" SuggestedHeight="36"
-                                  HorizontalAlignment="Right" VerticalAlignment="Center"
-                                  MarginRight="7"
-                                  Command.Click="ExecuteClose"
-                                  DoNotPassEventsToChildren="true"
-                                  Brush="ButtonBrush2">
-                      <Children>
-                        <TextWidget Text="X"
-                                    WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </Children>
-                    </ButtonWidget>
-                  </Children>
-                </Widget>
-
-                <!-- Tab bar 40px -->
-                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40"
-                           StackLayout.LayoutMethod="HorizontalLeftToRight"
-                           Sprite="BlankWhiteSquare_9" Color="#0F172AFF" AlphaFactor="1">
-                  <Children>
-                    <ButtonWidget Text="Hero"
-                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="36"
-                                  VerticalAlignment="Center" MarginLeft="5" MarginTop="2"
-                                  Command.Click="ExecuteSelectTab0"
-                                  IsSelected="@IsTab0Active"
-                                  ButtonType="Toggle"
-                                  Brush="ButtonBrush2" />
-                    <ButtonWidget Text="Party"
-                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="36"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
-                                  Command.Click="ExecuteSelectTab1"
-                                  IsSelected="@IsTab1Active"
-                                  ButtonType="Toggle"
-                                  Brush="ButtonBrush2" />
-                    <ButtonWidget Text="Settlement"
-                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="36"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
-                                  Command.Click="ExecuteSelectTab2"
-                                  IsSelected="@IsTab2Active"
-                                  ButtonType="Toggle"
-                                  Brush="ButtonBrush2" />
-                    <ButtonWidget Text="Export / Import"
-                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                  SuggestedWidth="200" SuggestedHeight="36"
-                                  VerticalAlignment="Center" MarginLeft="4" MarginTop="2"
-                                  Command.Click="ExecuteSelectTab3"
-                                  IsSelected="@IsTab3Active"
-                                  ButtonType="Toggle"
-                                  Brush="ButtonBrush2" />
-                  </Children>
-                </ListPanel>
-
-                <!-- Content area 720px -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="720">
+                <!-- ══════════════════════════════════════════════════════
+                     CONTENT  Fixed 747 px  — FIRST = TOP
+                ══════════════════════════════════════════════════════ -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="927">
                   <Children>
 
-                    <!-- STEP 1: Hero tab - minimal, only TextWidgets, sub-VM DataSource active -->
+                    <!-- TAB 0 : Hero -->
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            IsVisible="@IsTab0Active" DataSource="{HeroTab}">
+                            IsVisible="@IsTab0Active">
                       <Children>
+                        <!--
+                          CoverChildren + VerticalAlignment="Top" — proven Phase 1 pattern.
+                          DataSource on this ListPanel; all bindings resolve in HeroTabVM.
+                          Usable width: 920 − 30 − 30 = 860 px.
+                          Column math (3-col): 88 + 188 + 16 gap = 292 × 3 − 16 = 860 px ✓
+                          Column math (2-col): 100 + 226 + 8 + 72 = 406 × 2 + 12 = 824 px ✓
+                        -->
                         <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
-                                   StackLayout.LayoutMethod="VerticalTopToBottom"
-                                   MarginLeft="12" MarginRight="12" MarginTop="8">
+                                   VerticalAlignment="Top"
+                                   StackLayout.LayoutMethod="VerticalBottomToTop"
+                                   DataSource="{HeroTab}"
+                                   MarginLeft="30" MarginRight="30" MarginTop="10">
                           <Children>
-                            <TextWidget Text="[DEBUG STEP 1] Sub-VM binding active"
-                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                        MarginBottom="6" />
+
+                            <!-- ─── IDENTITY ─────────────────────────── -->
+
                             <TextWidget Text="@SelectedHeroName"
-                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                        MarginBottom="6" />
-                            <TextWidget Text="Gold:"
-                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" />
-                            <TextWidget Text="@GoldText"
-                                        WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" />
-                            <ButtonWidget Text="Apply Gold (test)"
-                                          WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                          SuggestedWidth="160" SuggestedHeight="28"
-                                          Brush="ButtonBrush2"
-                                          Command.Click="ExecuteApplyGold"
-                                          DoNotPassEventsToChildren="true" />
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                        HorizontalAlignment="Center" Color="#CFB53BFF" FontSize="24" />
+
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="26"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight"
+                                       HorizontalAlignment="Center"
+                                       MarginTop="4" MarginBottom="10">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                              SuggestedWidth="26" SuggestedHeight="24"
+                                              Command.Click="ExecutePrevHero"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children>
+                                    <TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" />
+                                  </Children>
+                                </ButtonWidget>
+                                <TextWidget Text="@HeroCountText"
+                                            WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="52"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            MarginLeft="15" MarginRight="15" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                              SuggestedWidth="26" SuggestedHeight="24"
+                                              MarginLeft="10"
+                                              Command.Click="ExecuteNextHero"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children>
+                                    <TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" />
+                                  </Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                              SuggestedWidth="64" SuggestedHeight="24" MarginLeft="30"
+                                              Command.Click="ExecuteRefreshHeroes"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children>
+                                    <TextWidget Text="Refresh" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" />
+                                  </Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginBottom="8" />
+
+                            <!-- ─── GENERAL STATS ─────────────────────── -->
+
+                            <TextWidget Text="General Stats"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="35" MarginBottom="15" />
+
+                            <!-- Level | Gold -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Level:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@HeroLevelText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="2" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="28" VerticalAlignment="Center" MarginLeft="40" Command.Click="ExecuteApplyLevel" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Set Level" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="10" SuggestedHeight="1" />
+                                <TextWidget Text="Gold:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@GoldText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="260" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="14" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="28" VerticalAlignment="Center" MarginLeft="40" Command.Click="ExecuteApplyGold" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Set Gold" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Renown | Influence -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Renown:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@RenownText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="196" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="6" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="28" VerticalAlignment="Center" MarginLeft="40" Command.Click="ExecuteApplyRenown" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Set Renown" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="1" />
+                                <TextWidget Text="Influence:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@InfluenceText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="196" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="6" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="28" VerticalAlignment="Center" MarginLeft="40" Command.Click="ExecuteApplyInfluence" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Set Influence" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── CHARACTER ATTRIBUTES ──────────────── -->
+
+                            <TextWidget Text="Character Attributes"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="35" MarginBottom="15" />
+
+                            <!-- Vigor | Control | Endurance -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Vigor:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@VigorText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MarginRight="16" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Control:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@ControlText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MarginRight="16" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Endurance:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@EnduranceText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Cunning | Social | Intelligence -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Cunning:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@CunningText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MarginRight="16" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Social:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@SocialText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MarginRight="16" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Intelligence:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="14" />
+                                <EditableTextWidget Text="@IntelligenceText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="22" VerticalAlignment="Center" MaxLength="2" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Attr action buttons -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="4">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="28" Command.Click="ExecuteApplyAttributes" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Apply All Attrs" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="28" MarginLeft="15" Command.Click="ExecuteAddAttributePoint" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="+1 Attr Point" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="28" MarginLeft="15" Command.Click="ExecuteAddFocusPoint" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="+1 Focus Point" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── HERO SKILLS ───────────────────────── -->
+
+                            <TextWidget Text="Hero Skills"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="35" MarginBottom="15" />
+
+                            <!-- Row 1: One Handed | Two Handed | Polearm -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="One Handed:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillOneHandedText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Two Handed:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillTwoHandedText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Polearm:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillPolearmText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row 2: Bow | Crossbow | Throwing -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Bow:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillBowText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Crossbow:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillCrossbowText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Throwing:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillThrowingText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row 3: Riding | Athletics | Crafting -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Riding:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillRidingText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Athletics:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillAthleticsText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Crafting:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillCraftingText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row 4: Scouting | Tactics | Roguery -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Scouting:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillScoutingText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Tactics:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillTacticsText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Roguery:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillRogueryText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row 5: Charm | Leadership | Trade -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Charm:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillCharmText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Leadership:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillLeadershipText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Trade:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillTradeText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row 6: Steward | Medicine | Engineering -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Steward:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillStewardText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Medicine:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillMedicineText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MarginRight="16" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                                <TextWidget Text="Engineering:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="88" VerticalAlignment="Center" FontSize="13" />
+                                <EditableTextWidget Text="@SkillEngineeringText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="188" SuggestedHeight="20" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="13" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Apply skills button -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginTop="15" MarginBottom="4">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="28"
+                                              Command.Click="ExecuteApplySkills" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Apply All Skills" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── COMBAT TOGGLES ────────────────────── -->
+
+                            <TextWidget Text="Combat Toggles"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="35" MarginBottom="15" />
+
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="15">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="28"
+                                              IsSelected="@IsInvulnerable"
+                                              Command.Click="ExecuteToggleInvulnerable"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Invulnerable" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="28" MarginLeft="20"
+                                              IsSelected="@IsImmortal"
+                                              Command.Click="ExecuteToggleImmortal"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Immortal" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="160" SuggestedHeight="28" MarginLeft="20"
+                                              IsSelected="@IsPersuasionAutoWin"
+                                              Command.Click="ExecuteTogglePersuasion"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Persuasion AutoWin" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
                           </Children>
                         </ListPanel>
                       </Children>
                     </Widget>
 
-                    <!-- Party tab placeholder -->
-                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            IsVisible="@IsTab1Active">
+                    <!-- TAB 1 placeholder -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab1Active">
                       <Children>
-                        <TextWidget Text="Party Tab - Phase 4"
-                                    WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        <TextWidget Text="Party Tab — Phase 4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
                     </Widget>
 
-                    <!-- Settlement tab placeholder -->
-                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            IsVisible="@IsTab2Active">
+                    <!-- TAB 2 placeholder -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab2Active">
                       <Children>
-                        <TextWidget Text="Settlement Tab - Phase 4"
-                                    WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        <TextWidget Text="Settlement Tab — Phase 4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
                     </Widget>
 
-                    <!-- IO tab placeholder -->
-                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            IsVisible="@IsTab3Active">
+                    <!-- TAB 3 placeholder -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab3Active">
                       <Children>
-                        <TextWidget Text="Export / Import Tab - Phase 5"
-                                    WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        <TextWidget Text="Export / Import — Phase 5" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Children>
                     </Widget>
@@ -148,16 +361,68 @@
                   </Children>
                 </Widget>
 
-                <!-- Status bar 35px -->
-                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="35"
-                        Sprite="BlankWhiteSquare_9" Color="#0F172AFF" AlphaFactor="1">
+                <!-- ══════════════════════════════════════════════════════
+                     STATUS BAR  Fixed 28px  — SECOND = middle
+                ══════════════════════════════════════════════════════ -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28"
+                        Sprite="BlankWhiteSquare_9" Color="#0D1117FF" AlphaFactor="1">
                   <Children>
                     <TextWidget Text="@StatusMessage"
                                 WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
                                 HorizontalAlignment="Left" VerticalAlignment="Center"
-                                MarginLeft="10" />
+                                MarginLeft="12" FontSize="14" />
                   </Children>
                 </Widget>
+
+                <!-- ══════════════════════════════════════════════════════
+                     TAB BAR  Fixed 45px  — LAST = BOTTOM
+                ══════════════════════════════════════════════════════ -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="55"
+                           StackLayout.LayoutMethod="HorizontalLeftToRight"
+                           Sprite="BlankWhiteSquare_9" Color="#0D1117FF" AlphaFactor="1">
+                  <Children>
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="210" SuggestedHeight="40"
+                                  VerticalAlignment="Center" MarginLeft="10" MarginRight="10"
+                                  Command.Click="ExecuteSelectTab0" IsSelected="@IsTab0Active"
+                                  DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                      <Children>
+                        <TextWidget Text="Hero" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                      </Children>
+                    </ButtonWidget>
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="210" SuggestedHeight="40"
+                                  VerticalAlignment="Center" MarginLeft="10" MarginRight="10"
+                                  Command.Click="ExecuteSelectTab1" IsSelected="@IsTab1Active"
+                                  DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                      <Children>
+                        <TextWidget Text="Party" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                      </Children>
+                    </ButtonWidget>
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="210" SuggestedHeight="40"
+                                  VerticalAlignment="Center" MarginLeft="10" MarginRight="10"
+                                  Command.Click="ExecuteSelectTab2" IsSelected="@IsTab2Active"
+                                  DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                      <Children>
+                        <TextWidget Text="Settlement" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                      </Children>
+                    </ButtonWidget>
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="210" SuggestedHeight="40"
+                                  VerticalAlignment="Center" MarginLeft="10" MarginRight="10"
+                                  Command.Click="ExecuteSelectTab3" IsSelected="@IsTab3Active"
+                                  DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                      <Children>
+                        <TextWidget Text="Export / Import" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                      </Children>
+                    </ButtonWidget>
+                  </Children>
+                </ListPanel>
 
               </Children>
             </ListPanel>

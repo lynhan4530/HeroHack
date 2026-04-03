@@ -225,3 +225,114 @@ _hudLayer = new HeroHackHudLayer(ToggleHeroHackPanel);  // order 100
 _hudLayer.InputRestrictions.SetInputRestrictions(false, InputUsageMask.Mouse);
 _mapScreen.AddLayer(_hudLayer);
 ```
+
+---
+
+## 14. Gauntlet `VerticalTopToBottom` Is INVERTED — Use `VerticalBottomToTop`
+
+**Verified via widget tree dump (Phase 2).**
+
+`StackLayout.LayoutMethod="VerticalTopToBottom"` places the **first** XML child at the **bottom** (highest Y value) and the **last** child at Y=0 (top of the container). This is the exact opposite of what the name implies.
+
+To get a normal top-to-bottom visual stack (first child at top, last at bottom), use:
+
+```xml
+<ListPanel StackLayout.LayoutMethod="VerticalBottomToTop" ...>
+```
+
+This was confirmed by a runtime widget tree dump showing:
+- Outer `VerticalTopToBottom`: Tab bar (last child) at Y=0, Content area (first child) at Y=73
+- Inner `VerticalTopToBottom`: "Combat Toggles" (last child) at Y=0, hero name (first child) at Y=602
+
+---
+
+## 15. How to Dump the Widget Tree at Runtime
+
+Add this to your `GauntletLayer` subclass to diagnose layout issues without screenshots:
+
+```csharp
+// Trigger 5 frames after panel opens (layout must settle first)
+private void DumpWidgetTree()
+{
+    var sb = new StringBuilder();
+    WalkWidget(UIContext.Root, 0, sb);
+    File.WriteAllText(@"Documents\HeroHack\widget_dump.txt", sb.ToString());
+}
+
+private static void WalkWidget(Widget w, int depth, StringBuilder sb)
+{
+    var indent = new string(' ', depth * 2);
+    // Use w.Left, w.Top, w.Right, w.Bottom — NOT w.GlobalPosition or w.Size (Vector2 causes CS0012)
+    sb.AppendLine($"{indent}[{(w.IsVisible?"V":"H")}] {w.GetType().Name} Y={w.Top:F0} X={w.Left:F0} W={w.Right-w.Left:F0} H={w.Bottom-w.Top:F0}");
+    for (int i = 0; i < w.ChildCount; i++) WalkWidget(w.GetChild(i), depth + 1, sb);
+}
+```
+
+**Do NOT use `w.GlobalPosition` or `w.Size`** — they return `Vector2` from `System.Numerics.Vectors` which is not referenced by default and causes `CS0012`. Use `w.Left`, `w.Top`, `w.Right`, `w.Bottom` instead.
+
+---
+
+## 16. `DataSource="{SubVM}"` Must Be on the `ListPanel`, Not a Wrapper Widget
+
+If you wrap the `DataSource` ListPanel in an outer `Widget` for visibility (`IsVisible="@IsTab0Active"`), bind `DataSource` to the **inner `ListPanel`** only — never the outer `Widget`.
+
+```xml
+<!-- CORRECT -->
+<Widget IsVisible="@IsTab0Active">
+  <Children>
+    <ListPanel DataSource="{HeroTab}" ...>  <!-- bindings resolve here -->
+```
+
+```xml
+<!-- WRONG — causes raw VM data to float at top-left or bindings to fail silently -->
+<Widget IsVisible="@IsTab0Active" DataSource="{HeroTab}">
+```
+
+---
+
+## 17. `ButtonType="Toggle"` Fires `Command.Click` Twice
+
+`ButtonType="Toggle"` causes the engine to fire `Command.Click` on both mousedown AND mouseup. For a toggle button that calls `ExecuteToggleX()` (which flips a bool), this means the bool flips twice — always returning to its original value (always appearing OFF).
+
+**Fix:** Remove `ButtonType="Toggle"`. Use `IsSelected="@IsBoolProp"` for the visual selected-state only, and let your `ExecuteToggleX()` method flip the bool manually.
+
+---
+
+## 18. `EditableTextWidget` Height — Use Fixed, Not Stretch
+
+`EditableTextWidget` with `HeightSizePolicy="StretchToParent"` is consumed by internal brush padding and only shows 1–2 characters vertically.
+
+**Fix:**
+```xml
+<EditableTextWidget HeightSizePolicy="Fixed" SuggestedHeight="22" FontSize="13" ... />
+```
+
+Use `SuggestedHeight="20"` for skill rows (3-col, tighter layout) and `SuggestedHeight="22"` for stat rows.
+
+---
+
+## 19. Gold Formatting — `ToString("N0")` + Strip Commas on Parse
+
+Display gold with thousand separators: `hero.Gold.ToString("N0")` → `"2,000,001,000"`.
+
+When reading back from an `EditableTextWidget` for parsing, strip the commas first:
+```csharp
+int.TryParse(_goldText.Replace(",", ""), out int gold)
+```
+
+---
+
+## 20. `CoverChildren + VerticalAlignment="Top"` for Scrollable Content Sections
+
+The proven pattern for a content section that sizes to its children and aligns to the top of its container:
+
+```xml
+<ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+           VerticalAlignment="Top"
+           StackLayout.LayoutMethod="VerticalBottomToTop"
+           DataSource="{HeroTab}"
+           MarginLeft="30" MarginRight="30" MarginTop="10">
+```
+
+This avoids the `StretchToParent` pitfall (which causes unreliable layout direction) and reliably anchors content to the top of the content area.
+

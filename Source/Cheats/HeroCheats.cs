@@ -69,14 +69,14 @@ namespace HeroHack.Cheats
         public static void SetSkill(Hero hero, SkillObject skill, int targetValue)
         {
             if (hero == null || skill == null) return;
-            targetValue = Math.Max(0, Math.Min(330, targetValue));
+            targetValue = Math.Max(0, Math.Min(9999, targetValue));
             hero.SetSkillValue(skill, targetValue);
         }
 
         public static void MaxAllSkills(Hero hero)
         {
             if (hero == null) return;
-            hero.SetSkillValue(DefaultSkills.OneHanded, 330);
+            hero.SetSkillValue(DefaultSkills.OneHanded, 9999);
             hero.SetSkillValue(DefaultSkills.TwoHanded, 330);
             hero.SetSkillValue(DefaultSkills.Polearm, 330);
             hero.SetSkillValue(DefaultSkills.Bow, 330);

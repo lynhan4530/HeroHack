@@ -10,8 +10,8 @@ Press **F10** on the campaign map (or click the **HH** button in the top-right c
 | Phase | Status | Feature |
 |-------|--------|---------|
 | 1 | ✅ Done | Panel opens/closes via F10 and HUD button. Tab bar switches between Hero / Party / Settlement / Export-Import tabs. |
-| 2 | 🔜 Next | Hero stat editing — Gold, Renown, Influence, Attributes, Skills, Level. Hero selector (player + companions). |
-| 3 | 🔜 | Combat toggles — Invulnerability, One-Hit Kill, Immortality, Persuasion Auto-Win (Harmony patches). |
+| 2 | ✅ Done | Hero stat editing — Gold (formatted), Renown, Influence, Attributes, Skills (all 18, cap 0–9999), Level. Hero selector (player + companions with Prev/Next/Refresh). Combat toggles (Invulnerable, Immortal, Persuasion AutoWin). |
+| 3 | 🔜 Next | Harmony patches — true runtime Invulnerability, One-Hit Kill, Immortality, Persuasion Auto-Win. |
 | 4 | 🔜 | Party cheats — Add troops, max morale, add food, heal all. Settlement cheats — Prosperity, Loyalty, Security, Garrison. |
 | 5 | 🔜 | XML Export / Import — full hero profile round-trip to `Documents\HeroHack\exports\`. |
 | 6 | 🔜 | Polish — error handling, status messages, final QA. |
@@ -53,15 +53,18 @@ HeroHack/
 ├── SubModule.xml
 ├── GUI/
 │   └── Prefabs/
-│       ├── HeroHackPanel.xml   ← Main cheat panel (900×700, tabbed)
+│       ├── HeroHackPanel.xml   ← Main cheat panel (920×1010, tabbed)
 │       └── HeroHackHud.xml     ← Persistent HH button (top-right map HUD)
 └── Source/
     ├── SubModule.cs            ← Entry point: Harmony init, layer injection, F10 hotkey
+    ├── Cheats/
+    │   └── HeroCheats.cs       ← Static helpers: SetSkill, MaxAllSkills, AddGold, etc.
     └── UI/
-        ├── HeroHackLayer.cs    ← GauntletLayer (order 200) for the main panel
+        ├── HeroHackLayer.cs    ← GauntletLayer (order 200) for the main panel; widget-tree diagnostic dump
         ├── HeroHackHudLayer.cs ← GauntletLayer (order 100) for the HUD button
         ├── HeroHackPanelVM.cs  ← Main ViewModel: IsOpen, tab switching, status bar
-        └── HeroHackHudVM.cs    ← HUD button ViewModel
+        ├── HeroHackHudVM.cs    ← HUD button ViewModel
+        └── HeroTabVM.cs        ← Hero tab: all stat/skill/toggle bindings + companion navigation
 ```
 
 ## License
