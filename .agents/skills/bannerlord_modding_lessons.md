@@ -336,3 +336,109 @@ The proven pattern for a content section that sizes to its children and aligns t
 
 This avoids the `StretchToParent` pitfall (which causes unreliable layout direction) and reliably anchors content to the top of the content area.
 
+---
+
+## 21. `Agent.CurrentMortalityState` Getter Patch Corrupts Character Screen
+
+**DO NOT** patch `Agent.CurrentMortalityState` (getter) to force `MortalityState.Invulnerable`.
+
+The character/party screen creates **preview agents** to render hero models. Our postfix checked `__instance.IsPlayerControlled`, but preview agents representing the player character also return true for this check. Forcing their MortalityState to `Invulnerable` poisons the animation controller — the engine renders them in a static ragdoll/death pose (floating horizontally, no idle animation).
+
+This affects **all** characters across **all** save files while the patch is active. Removing the patch immediately fixes it (no save corruption — it's a runtime rendering issue).
+
+**Use `MissionBehavior.OnMissionTick` HP-clamping instead** (see lesson 24).
+
+---
+
+## 22. Harmony Cannot Patch `SandboxAgentApplyDamageModel.CalculateDamage`
+
+Attempting to `[HarmonyPatch]` this method causes a **native crash at startup** during `PatchAll()`. No managed exception is logged — the engine terminates silently.
+
+The method signature is:
+```csharp
+float CalculateDamage(ref AttackInformation, ref AttackCollisionData, float baseDamage)
+```
+
+`AttackInformation` is a large struct (~100 fields) passed by ref. Harmony's IL rewriter appears unable to generate a valid trampoline for this signature on Bannerlord's Mono runtime. BannerlordCheats (v3.0.3) claimed to patch this successfully, but that was for an older game version.
+
+**Workaround:** Use `MissionBehavior` callbacks (`OnMissionTick`, `OnAgentHit`) which don't require Harmony.
+
+---
+
+## 23. Crash Debugging — Bannerlord Log Locations
+
+Crash logs are at: `C:\ProgramData\Mount and Blade II Bannerlord\crashes\<timestamp>\`
+
+Key files:
+- `rgl_log_<pid>.txt` — engine log. Multiple PIDs exist (watchdog, child processes). The **crashing process** is the one whose log does NOT end with `Managed Interface deleted.`
+- `crash_tags.txt` — system info only; rarely contains the exception
+- `rgl_log_errors_<pid>.txt` — usually empty for managed crashes
+- `watchdog_log_<pid>.txt` — memory dump info, not useful for debugging
+
+For managed exceptions, search with:
+```powershell
+Select-String -Path "C:\ProgramData\Mount and Blade II Bannerlord\crashes\<timestamp>\rgl_log_*.txt" -Pattern "exception|error|fail|TypeLoad|MissingMethod" -CaseSensitive:$false
+```
+
+If no managed exception appears, the crash is from Harmony IL generation failing at the native level during `PatchAll()`.
+
+---
+
+## 24. The Correct Invulnerability Pattern — MissionBehavior HP Clamp
+
+The only approach that works without causing ragdoll corruption or startup crashes:
+
+```csharp
+public class HeroHackMissionBehavior : MissionBehavior
+{
+    public override MissionBehaviorType BehaviorType => MissionBehaviorType.Other;
+
+    public override void OnMissionTick(float dt)
+    {
+        Agent player = Agent.Main;
+        if (player == null || !player.IsActive()) return;
+
+        if (CombatCheats.IsPlayerInvulnerable && player.Health < player.HealthLimit)
+            player.Health = player.HealthLimit;
+    }
+
+    public override void OnAgentHit(Agent affected, Agent affector, 
+        in MissionWeapon weapon, in Blow blow, in AttackCollisionData data)
+    {
+        if (CombatCheats.IsOneHitKill && affector == Agent.Main 
+            && affected != Agent.Main && affected.IsActive())
+        {
+            affected.Health = 0;
+            var killBlow = new Blow(affector.Index) { InflictedDamage = 10000 };
+            affected.Die(killBlow);
+        }
+    }
+}
+```
+
+Wired in SubModule via:
+```csharp
+public override void OnMissionBehaviorInitialize(Mission mission)
+{
+    base.OnMissionBehaviorInitialize(mission);
+    mission.AddMissionBehavior(new HeroHackMissionBehavior());
+}
+```
+
+**Why this works:**
+- `OnMissionTick` runs every frame in managed code — player HP is restored before the engine processes state transitions
+- No Harmony patches on native-passing-by-ref structs
+- No `MortalityState` override that corrupts preview agent rendering
+- `OnAgentHit` fires after damage is dealt — safe to kill the enemy there
+
+---
+
+## 25. `OnMissionBehaviorInitialize(Mission)` Signature
+
+`MBSubModuleBase.OnMissionBehaviorInitialize` is virtual and takes one parameter:
+```csharp
+public override void OnMissionBehaviorInitialize(Mission mission)
+```
+
+Do **not** call it with zero parameters — it won't compile silently (it overloads a different method).
+

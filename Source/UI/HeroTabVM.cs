@@ -62,6 +62,13 @@ namespace HeroHack.UI
         public HeroTabVM(Action<string> onStatusUpdate)
         {
             _onStatusUpdate = onStatusUpdate;
+
+            // Sync toggle state from CombatCheats so re-opening the panel
+            // shows the correct ON/OFF state.
+            _isInvulnerable = CombatCheats.IsPlayerInvulnerable;
+            _isImmortal = CombatCheats.IsPlayerImmortal;
+            _isPersuasionAutoWin = CombatCheats.IsPersuasionAutoWin;
+
             RefreshHeroList();
         }
 

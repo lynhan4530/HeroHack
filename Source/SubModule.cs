@@ -7,6 +7,7 @@ using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ScreenSystem;
+using HeroHack.Patches;
 using HeroHack.UI;
 
 namespace HeroHack
@@ -57,6 +58,12 @@ namespace HeroHack
             if (_layersInjected && Input.IsKeyPressed(InputKey.F10))
             {
                 ToggleHeroHackPanel();
+            }
+
+            // F11 → diagnostic dump (works on campaign map)
+            if (isOnMap && Input.IsKeyPressed(InputKey.F11))
+            {
+                DiagnosticHelper.DumpHeroState();
             }
         }
 
@@ -125,6 +132,12 @@ namespace HeroHack
             _hudLayer = null;
             _mapScreen = null;
             _layersInjected = false;
+        }
+
+        public override void OnMissionBehaviorInitialize(Mission mission)
+        {
+            base.OnMissionBehaviorInitialize(mission);
+            mission.AddMissionBehavior(new Patches.HeroHackMissionBehavior());
         }
     }
 }

@@ -29,6 +29,10 @@
       <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.DotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="TaleWorlds.CampaignSystem">
       <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.dll</HintPath>
       <Private>False</Private>
@@ -72,6 +76,11 @@
     <!-- SandBox.View lives under the SandBox module, not the main bin -->
     <Reference Include="SandBox.View">
       <HintPath>$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\SandBox.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- SandBox.dll for DefaultPersuasionModel, KillCharacterAction, etc. -->
+    <Reference Include="SandBox">
+      <HintPath>$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\SandBox.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
