@@ -334,27 +334,378 @@
                       </Children>
                     </Widget>
 
-                    <!-- TAB 1 placeholder -->
+                    <!-- TAB 1 : Party -->
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab1Active">
                       <Children>
-                        <TextWidget Text="Party Tab — Phase 4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   VerticalAlignment="Top"
+                                   StackLayout.LayoutMethod="VerticalBottomToTop"
+                                   DataSource="{PartyTab}"
+                                   MarginLeft="30" MarginRight="30" MarginTop="10">
+                          <Children>
+
+                            <!-- Title -->
+                            <TextWidget Text="Main Party" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                        HorizontalAlignment="Center" Color="#CFB53BFF" FontSize="24" />
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginBottom="8" />
+
+                            <!-- ─── STATUS ─────────────────────────────── -->
+
+                            <TextWidget Text="Status"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- Morale | Food | Wounded | Size -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Morale:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" />
+                                <TextWidget Text="@MoraleText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Food:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="50" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@FoodText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Wounded:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@WoundedText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Size:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="50" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@PartySizeText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="130" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── ACTIONS ────────────────────────────── -->
+
+                            <TextWidget Text="Actions"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- Boost Morale | Heal All -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="140" SuggestedHeight="30"
+                                              Command.Click="ExecuteBoostMorale"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Boost Morale" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="30"
+                                              MarginLeft="20"
+                                              Command.Click="ExecuteHealAll"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Heal All Wounded" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Add Food: count input + button -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Add Food:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="85" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@AddFoodCountText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="6" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteAddFood"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Add Food" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Add Troops: count input + button -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Add Troops:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@AddTroopCountText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteAddTroops"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Add Troops" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                          </Children>
+                        </ListPanel>
                       </Children>
                     </Widget>
 
-                    <!-- TAB 2 placeholder -->
+                    <!-- TAB 2 : Settlement -->
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab2Active">
                       <Children>
-                        <TextWidget Text="Settlement Tab — Phase 4" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   VerticalAlignment="Top"
+                                   StackLayout.LayoutMethod="VerticalBottomToTop"
+                                   DataSource="{SettlementTab}"
+                                   MarginLeft="30" MarginRight="30" MarginTop="10">
+                          <Children>
+
+                            <!-- Settlement Name -->
+                            <TextWidget Text="@SettlementName" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                        HorizontalAlignment="Center" Color="#CFB53BFF" FontSize="24" />
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginBottom="8" />
+
+                            <!-- ─── STATUS ─────────────────────────────── -->
+
+                            <TextWidget Text="Status"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- Prosperity | Loyalty | Security -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Prosperity:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" VerticalAlignment="Center" FontSize="15" />
+                                <TextWidget Text="@ProsperityText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Loyalty:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@LoyaltyText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Security:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="75" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@SecurityText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Food Stocks | Garrison -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Food Stocks:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" VerticalAlignment="Center" FontSize="15" />
+                                <TextWidget Text="@FoodText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="Garrison:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="78" VerticalAlignment="Center" FontSize="15" MarginLeft="30" />
+                                <TextWidget Text="@GarrisonText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="130" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                              </Children>
+                            </ListPanel>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── ACTIONS ────────────────────────────── -->
+
+                            <TextWidget Text="Actions"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- Max Prosperity | Max Loyalty | Max Security -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="30"
+                                              Command.Click="ExecuteMaxProsperity"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Max Prosperity" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteMaxLoyalty"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Max Loyalty" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteMaxSecurity"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Max Security" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Set Prosperity: input + button -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Prosperity:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="95" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@SetProsperityText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="5" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="140" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteSetProsperity"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Set Prosperity" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Fill Garrison: count input + button | Max Food Stocks -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Garrison add:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="110" VerticalAlignment="Center" FontSize="15" />
+                                <EditableTextWidget Text="@AddGarrisonText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="14" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="30"
+                                              MarginLeft="15"
+                                              Command.Click="ExecuteFillGarrison"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Fill Garrison" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="150" SuggestedHeight="30"
+                                              MarginLeft="20"
+                                              Command.Click="ExecuteMaxFoodStocks"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Max Food Stocks" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                          </Children>
+                        </ListPanel>
                       </Children>
                     </Widget>
 
-                    <!-- TAB 3 placeholder -->
+                    <!-- TAB 3 : Export / Import -->
                     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsTab3Active">
                       <Children>
-                        <TextWidget Text="Export / Import — Phase 5" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   VerticalAlignment="Top"
+                                   StackLayout.LayoutMethod="VerticalBottomToTop"
+                                   DataSource="{IOTab}"
+                                   MarginLeft="30" MarginRight="30" MarginTop="10">
+                          <Children>
+
+                            <!-- Title -->
+                            <TextWidget Text="Export / Import" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                        HorizontalAlignment="Center" Color="#CFB53BFF" FontSize="24" />
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginBottom="8" />
+
+                            <!-- ─── EXPORT SECTION ──────────────────────── -->
+
+                            <TextWidget Text="Export Hero"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- Hero nav: prev / name+count / next -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              Command.Click="ExecutePrevExportHero"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <TextWidget Text="@ExportHeroName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="260"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="16" Color="#CFB53BFF" />
+                                <TextWidget Text="@ExportCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
+                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              Command.Click="ExecuteNextExportHero"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Export button -->
+                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="160" SuggestedHeight="32"
+                                          Command.Click="ExecuteExport"
+                                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2" MarginBottom="12">
+                              <Children><TextWidget Text="Export to XML" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                            </ButtonWidget>
+
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                    Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
+
+                            <!-- ─── IMPORT SECTION ──────────────────────── -->
+
+                            <TextWidget Text="Import Profile"
+                                        WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+
+                            <!-- File nav: prev / filename+count / next / Refresh -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              Command.Click="ExecutePrevFile"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <TextWidget Text="@ImportFileName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="340"
+                                            VerticalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="13" />
+                                <TextWidget Text="@ImportFileCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
+                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              Command.Click="ExecuteNextFile"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" SuggestedHeight="30"
+                                              MarginLeft="16"
+                                              Command.Click="ExecuteRefreshFiles"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Refresh" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Import target hero nav -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Apply to:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70"
+                                            VerticalAlignment="Center" FontSize="15" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              MarginLeft="8"
+                                              Command.Click="ExecutePrevImportTarget"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <TextWidget Text="@ImportTargetName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="220"
+                                            VerticalAlignment="Center" HorizontalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="16" Color="#CFB53BFF" />
+                                <TextWidget Text="@ImportTargetCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
+                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
+                                              Command.Click="ExecuteNextImportTarget"
+                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Import button -->
+                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="32"
+                                          Command.Click="ExecuteImport"
+                                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2" MarginBottom="12">
+                              <Children><TextWidget Text="Import" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                            </ButtonWidget>
+
+                            <!-- Confirm group — only visible after clicking Import -->
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    IsVisible="@ShowImportConfirm">
+                              <Children>
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                           StackLayout.LayoutMethod="VerticalBottomToTop">
+                                  <Children>
+                                    <TextWidget Text="@ImportConfirmText"
+                                                WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24"
+                                                VerticalAlignment="Center" FontSize="14" Color="#FF9900FF" MarginBottom="8" />
+                                    <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                               StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                      <Children>
+                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="30"
+                                                      Command.Click="ExecuteImportConfirm"
+                                                      DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                          <Children><TextWidget Text="Confirm Import" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                        </ButtonWidget>
+                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="90" SuggestedHeight="30"
+                                                      MarginLeft="16"
+                                                      Command.Click="ExecuteImportCancel"
+                                                      DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                          <Children><TextWidget Text="Cancel" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                        </ButtonWidget>
+                                      </Children>
+                                    </ListPanel>
+                                  </Children>
+                                </ListPanel>
+                              </Children>
+                            </Widget>
+
+                          </Children>
+                        </ListPanel>
                       </Children>
                     </Widget>
 

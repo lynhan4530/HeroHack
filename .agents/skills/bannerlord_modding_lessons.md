@@ -70,3 +70,35 @@ No ragdoll corruption, no Harmony ref-struct issues, catches all damage sources 
 
 **25. `OnMissionBehaviorInitialize`** takes `Mission mission` (one param, virtual). Not zero params.
 
+## Campaign API — Party & Settlement (Phase 4)
+
+**26. `FoodStocksUpperLimit` is a method, not a property.** Call as `town.FoodStocksUpperLimit()`. `FoodStocks` (the stock level itself) IS a settable property.
+
+**27. `MobileParty.LimitedPartySize` does not exist in v1.3.x.** Use `party.MemberRoster.TotalManCount` for current size. Party limit is not trivially readable without Campaign infrastructure.
+
+**28. `MobileParty.MainParty.Morale` is read-only.** Write to `party.RecentEventsMorale` (float) to give a temporary boost. Setting it to 100f = instant max boost — label this "Boost", not "Max", since it decays over time.
+
+**29. Heal all wounded: use index-based `AddToCountsAtIndex`, not foreach.** Mutating a roster while iterating crashes. Loop `for (int i = 0; i < roster.Count; i++)`, read `GetElementWoundedNumber(i)`, call `AddToCountsAtIndex(i, 0, -wounded, 0)`.
+
+**30. `Hero.Culture?.BasicTroop` can be null for modded or special cultures.** Always null-guard before calling `AddToCounts`.
+
+**31. Settlement null guards — two checks required:**
+```csharp
+var s = Settlement.CurrentSettlement;
+if (s == null) return "Not in a settlement.";
+if (!s.IsTown && !s.IsCastle) return "Must be in a town or castle.";
+var town = s.Town; // Town class lives in TaleWorlds.CampaignSystem.Settlements
+```
+`Settlement.CurrentSettlement` is null on the campaign map outside a settlement. `s.Town` is null for villages.
+
+## IO / Export-Import (Phase 5)
+
+**32. Phase 5 API names — DLL-verified:**
+- Focus: `HeroDeveloper.GetFocus(skill)` / `AddFocus(skill, delta, false)` / `RemoveFocus(skill, delta)`. `SetFocus` and `GetFocusValue` do NOT exist.
+- Perks: `Hero.GetPerkValue(perk)` / `HeroDeveloper.AddPerk(perk)`. `Hero.SetPerkValue` does NOT exist — import is additive only for perks.
+- Traits: `Hero.GetTraitLevel(trait)` / `Hero.SetTraitLevel(trait, value)` — both exist.
+- Perk/Trait iteration: `MBObjectManager.Instance.GetObjectTypeList<PerkObject>()` / `GetObjectTypeList<TraitObject>()`. `PerkObject.All` and `TraitObject.All` do NOT exist.
+- `PerkObject` and `TraitObject` are in namespace `TaleWorlds.CampaignSystem.CharacterDevelopment`.
+- Stealth equipment: `hero.StealthEquipment` — exists and is writable via indexer, same pattern as `BattleEquipment` and `CivilianEquipment`.
+- `Hero.Clan` can be null for clanless heroes (wanderers) — always guard before calling `AddRenown`.
+
