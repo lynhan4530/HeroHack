@@ -99,7 +99,7 @@ namespace HeroHack.Cheats
         {
             var s = Settlement.CurrentSettlement;
             if (s == null)
-                return ("—", "—", "—", "—", "—", "—");
+                return ("No Settlement Selected", "—", "—", "—", "—", "—");
             if (!s.IsTown && !s.IsCastle)
                 return (s.Name?.ToString() ?? "?", "N/A", "N/A", "N/A", "N/A", "N/A");
 

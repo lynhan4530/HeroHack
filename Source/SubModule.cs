@@ -55,9 +55,18 @@ namespace HeroHack
                 RemoveLayers();
             }
 
-            if (_layersInjected && Input.IsKeyPressed(InputKey.F10))
+            if (_layersInjected)
             {
-                ToggleHeroHackPanel();
+                if (Input.IsKeyPressed(InputKey.F10))
+                {
+                    ToggleHeroHackPanel();
+                }
+                else if (_heroHackLayer != null && !_heroHackLayer.IsOpen && _heroHackLayer.IsFocusLayer)
+                {
+                    // Clean up input restrictions if panel was closed via the internal X button
+                    _heroHackLayer.InputRestrictions.ResetInputRestrictions();
+                    _heroHackLayer.IsFocusLayer = false;
+                }
             }
 
             // F11 → diagnostic dump (works on campaign map)

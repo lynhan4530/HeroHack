@@ -12,7 +12,6 @@ namespace HeroHack.UI
         private PartyTabVM _partyTab = null!;          // Bug 8
         private SettlementTabVM _settlementTab = null!; // Bug 8
         private IOTabVM _ioTab = null!;
-
         public HeroHackPanelVM()
         {
             _activeTabIndex = 0;

@@ -14,7 +14,7 @@ Press **F10** on the campaign map (or click the **HH** button in the top-right c
 | 3 | ✅ Done | Harmony patches — Invulnerability (HP clamp via MissionBehavior), One-Hit Kill (OnAgentHit), Immortality (blocks KillCharacterAction), Persuasion Auto-Win (DefaultPersuasionModel postfix). |
 | 4 | ✅ Done | Party cheats — Boost morale, add food, heal all wounded, add troops. Settlement cheats — Prosperity, Loyalty, Security, fill garrison, max food stocks. |
 | 5 | ✅ Done | XML Export / Import — full hero profile serialised to `Documents\HeroHack\exports\`. Covers identity, attributes, all 18 skills + focus, perks, traits, Battle/Stealth/Civilian equipment (all 12 slots each). Two-step import with confirm flow. |
-| 6 | 🔜 | Polish — error handling, status messages, final QA. |
+| 6 | ✅ Done | Polish — UI alignment overhauls, error handling, status messages, final QA. |
 
 ---
 
@@ -86,7 +86,7 @@ HeroHack/
 ## Export / Import Format
 
 Exports are saved to `%USERPROFILE%\Documents\HeroHack\exports\` as XML files named:  
-`<hero_id>_day<campaign_day>_<HHmmss>.xml`
+`<HeroName>_<yyyy-MM-dd>_<HH-mm>.xml`
 
 The XML schema (`schema_version="1"`) covers:
 - **Identity** — string_id, name, culture, clan, age, level, gold, renown

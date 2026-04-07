@@ -1,4 +1,4 @@
-﻿<Prefab>
+<Prefab>
   <Window>
     <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsOpen">
       <Children>
@@ -14,18 +14,7 @@
                 Sprite="BlankWhiteSquare_9" Color="#0D1117FF" AlphaFactor="1.0">
           <Children>
 
-            <!-- Floating X close button (above everything) -->
-            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                          SuggestedWidth="34" SuggestedHeight="30"
-                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                          MarginRight="6" MarginTop="6"
-                          Command.Click="ExecuteClose"
-                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
-              <Children>
-                <TextWidget Text="X" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
-              </Children>
-            </ButtonWidget>
+
 
             <!--
               =============================================================
@@ -578,33 +567,35 @@
                                         WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
                                         HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
 
-                            <!-- Hero nav: prev / name+count / next -->
-                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
-                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center" MarginBottom="12">
                               <Children>
+                                <TextWidget Text="Step 1: Select Hero" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="15" Color="#888888FF" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              Command.Click="ExecutePrevExportHero"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecutePrevExportHero" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
                                 </ButtonWidget>
-                                <TextWidget Text="@ExportHeroName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="260"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="16" Color="#CFB53BFF" />
-                                <TextWidget Text="@ExportCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
-                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <TextWidget Text="@ExportHeroName" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginLeft="15" MarginRight="10"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Color="#CFB53BFF" />
+                                <TextWidget Text="@ExportCountText" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="14" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              Command.Click="ExecuteNextExportHero"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecuteNextExportHero" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+
+                                <!-- spacer -->
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="60" SuggestedHeight="1" />
+
+                                <TextWidget Text="Step 2:" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="15" Color="#888888FF" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="38"
+                                              Command.Click="ExecuteExport" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Export to XML" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" /></Children>
                                 </ButtonWidget>
                               </Children>
                             </ListPanel>
-
-                            <!-- Export button -->
-                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="160" SuggestedHeight="32"
-                                          Command.Click="ExecuteExport"
-                                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2" MarginBottom="12">
-                              <Children><TextWidget Text="Export to XML" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
-                            </ButtonWidget>
 
                             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
                                     Sprite="BlankWhiteSquare_9" Color="#55627EFF" MarginTop="4" MarginBottom="8" />
@@ -613,65 +604,61 @@
 
                             <TextWidget Text="Import Profile"
                                         WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
-                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="20" MarginBottom="15" />
+                                        HorizontalAlignment="Left" FontSize="17" Color="#CFB53BFF" MarginTop="30" MarginBottom="15" />
 
-                            <!-- File nav: prev / filename+count / next / Refresh -->
-                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
-                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center" MarginBottom="12">
                               <Children>
+                                <TextWidget Text="Step 1: Select File" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="15" Color="#888888FF" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              Command.Click="ExecutePrevFile"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecutePrevFile" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
                                 </ButtonWidget>
-                                <TextWidget Text="@ImportFileName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="340"
-                                            VerticalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="13" />
-                                <TextWidget Text="@ImportFileCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
-                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <TextWidget Text="@ImportFileName" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginLeft="15" MarginRight="10"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" Color="#CFB53BFF" />
+                                <TextWidget Text="@ImportFileCountText" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="14" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              Command.Click="ExecuteNextFile"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecuteNextFile" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
                                 </ButtonWidget>
-                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" SuggestedHeight="30"
-                                              MarginLeft="16"
-                                              Command.Click="ExecuteRefreshFiles"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
-                                  <Children><TextWidget Text="Refresh" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" /></Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="30"
+                                              MarginLeft="25" Command.Click="ExecuteRefreshFiles" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Rescan Files" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
                                 </ButtonWidget>
                               </Children>
                             </ListPanel>
 
-                            <!-- Import target hero nav -->
-                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
-                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center" MarginBottom="12" MarginTop="10">
                               <Children>
-                                <TextWidget Text="Apply to:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="70"
-                                            VerticalAlignment="Center" FontSize="15" />
+                                <TextWidget Text="Step 2: Apply To" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="15" Color="#888888FF" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              MarginLeft="8"
-                                              Command.Click="ExecutePrevImportTarget"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecutePrevImportTarget" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
                                 </ButtonWidget>
-                                <TextWidget Text="@ImportTargetName" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="220"
-                                            VerticalAlignment="Center" HorizontalAlignment="Center" MarginLeft="12" MarginRight="6" FontSize="16" Color="#CFB53BFF" />
-                                <TextWidget Text="@ImportTargetCountText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60"
-                                            VerticalAlignment="Center" FontSize="13" MarginRight="12" />
+                                <TextWidget Text="@ImportTargetName" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginLeft="15" MarginRight="10"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Color="#CFB53BFF" />
+                                <TextWidget Text="@ImportTargetCountText" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="14" />
                                 <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30"
-                                              Command.Click="ExecuteNextImportTarget"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                              Command.Click="ExecuteNextImportTarget" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
                                   <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+
+                                <!-- spacer -->
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40" SuggestedHeight="1" />
+
+                                <TextWidget Text="Step 3:" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginRight="15"
+                                            VerticalAlignment="Center" FontSize="15" Color="#888888FF" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="240" SuggestedHeight="42"
+                                              Command.Click="ExecuteImport" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Import Profile" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" /></Children>
                                 </ButtonWidget>
                               </Children>
                             </ListPanel>
-
-                            <!-- Import button -->
-                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="32"
-                                          Command.Click="ExecuteImport"
-                                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2" MarginBottom="12">
-                              <Children><TextWidget Text="Import" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
-                            </ButtonWidget>
 
                             <!-- Confirm group — only visible after clicking Import -->
                             <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
@@ -777,6 +764,19 @@
 
               </Children>
             </ListPanel>
+
+            <!-- Floating X close button (moved to bottom to guarantee render on top of the glass ListPanel) -->
+            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                          SuggestedWidth="34" SuggestedHeight="30"
+                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                          MarginRight="6" MarginTop="6"
+                          Command.Click="ExecuteClose"
+                          DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+              <Children>
+                <TextWidget Text="X" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+              </Children>
+            </ButtonWidget>
 
           </Children>
         </Widget>

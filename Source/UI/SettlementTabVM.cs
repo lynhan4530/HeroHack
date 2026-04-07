@@ -9,7 +9,7 @@ namespace HeroHack.UI
         private readonly Action<string> _onStatusUpdate;
 
         // Display fields — Bug 10: no game API in constructor
-        private string _settlementName   = "—";
+        private string _settlementName   = "No Settlement Selected";
         private string _prosperityText   = "—";
         private string _loyaltyText      = "—";
         private string _securityText     = "—";

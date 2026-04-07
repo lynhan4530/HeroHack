@@ -19,11 +19,10 @@ namespace HeroHack.IO
                 "HeroHack", "exports");
             Directory.CreateDirectory(dir);
 
-            // Bug 7: CampaignTime.Now.ToDays for unique day; Bug 12: HHmmss timestamp suffix
-            int day = Campaign.Current != null ? (int)CampaignTime.Now.ToDays : 0;
-            string timestamp = DateTime.UtcNow.ToString("HHmmss");
-            string safeId = SanitiseId(hero.StringId);
-            string fileName = $"{safeId}_day{day}_{timestamp}.xml";
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm");
+            string heroName = hero.Name != null ? hero.Name.ToString() : "UnknownHero";
+            string safeName = SanitiseId(heroName);
+            string fileName = $"{safeName}_{timestamp}.xml";
             string filePath = Path.Combine(dir, fileName);
 
             var doc = BuildXml(hero);
