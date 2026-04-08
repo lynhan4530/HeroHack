@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using HeroHack.Cheats;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Library;
 
@@ -16,7 +19,18 @@ namespace HeroHack.UI
         private string _partySizeText = "--";
         private string _addTroopCountText = "50";
         private string _addFoodCountText  = "200";
+        private string _addEliteTroopCountText = "50";
+        private List<CharacterObject> _eliteTroops = new List<CharacterObject>();
+        private int _eliteTroopIndex = 0;
+        private string _eliteTroopName = "—";
 
+        private List<string> _factions = new List<string> { "Any", "Empire", "Vlandia", "Battania", "Khuzait", "Aserai", "Sturgia" };
+        private List<string> _classes = new List<string> { "Any", "Infantry", "Ranged", "Cavalry", "Horse Archer" };
+        private List<string> _tiers = new List<string> { "Any", "Tier 2", "Tier 3", "Tier 4", "Tier 5", "Tier 6" };
+        private int _factionFilterIndex = 0;
+        private int _classFilterIndex = 0;
+        private int _tierFilterIndex = 0;
+        
         public PartyTabVM(Action<string> onStatusUpdate)
         {
             _onStatusUpdate = onStatusUpdate;
@@ -67,11 +81,30 @@ namespace HeroHack.UI
             set { if (_addFoodCountText != value) { _addFoodCountText = value; OnPropertyChangedWithValue(value, nameof(AddFoodCountText)); } }
         }
 
+        [DataSourceProperty]
+        public string AddEliteTroopCountText
+        {
+            get => _addEliteTroopCountText;
+            set { if (_addEliteTroopCountText != value) { _addEliteTroopCountText = value; OnPropertyChangedWithValue(value, nameof(AddEliteTroopCountText)); } }
+        }
+
+        [DataSourceProperty]
+        public string EliteTroopName
+        {
+            get => _eliteTroopName;
+            set { if (_eliteTroopName != value) { _eliteTroopName = value; OnPropertyChangedWithValue(value, nameof(EliteTroopName)); } }
+        }
+
+        [DataSourceProperty] public string FactionFilterText => _factions[_factionFilterIndex];
+        [DataSourceProperty] public string ClassFilterText => _classes[_classFilterIndex];
+        [DataSourceProperty] public string TierFilterText => _tiers[_tierFilterIndex];
+
         // ── Refresh ────────────────────────────────────────────────────────
 
         // Bug 9: called from HeroHackPanelVM.ExecuteSelectTab1() so display is always fresh
         public void RefreshDisplay()
         {
+            RefreshEliteTroops();
             try
             {
                 var party = MobileParty.MainParty;
@@ -116,6 +149,7 @@ namespace HeroHack.UI
             catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
         }
 
+        // TODO: Need to have culture selection for basic spawn as well
         public void ExecuteAddTroops()
         {
             try
@@ -124,6 +158,129 @@ namespace HeroHack.UI
                 _onStatusUpdate(PartyCheats.AddTroops(amt));
                 RefreshDisplay();
             }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecutePrevFactionFilter() { _factionFilterIndex = (_factionFilterIndex - 1 + _factions.Count) % _factions.Count; OnPropertyChanged("FactionFilterText"); RefreshEliteTroops(true); }
+        public void ExecuteNextFactionFilter() { _factionFilterIndex = (_factionFilterIndex + 1) % _factions.Count; OnPropertyChanged("FactionFilterText"); RefreshEliteTroops(true); }
+
+        public void ExecutePrevClassFilter() { _classFilterIndex = (_classFilterIndex - 1 + _classes.Count) % _classes.Count; OnPropertyChanged("ClassFilterText"); RefreshEliteTroops(true); }
+        public void ExecuteNextClassFilter() { _classFilterIndex = (_classFilterIndex + 1) % _classes.Count; OnPropertyChanged("ClassFilterText"); RefreshEliteTroops(true); }
+
+        public void ExecutePrevTierFilter() { _tierFilterIndex = (_tierFilterIndex - 1 + _tiers.Count) % _tiers.Count; OnPropertyChanged("TierFilterText"); RefreshEliteTroops(true); }
+        public void ExecuteNextTierFilter() { _tierFilterIndex = (_tierFilterIndex + 1) % _tiers.Count; OnPropertyChanged("TierFilterText"); RefreshEliteTroops(true); }
+
+        public void ExecutePrevEliteTroop()
+        {
+            if (_eliteTroops.Count <= 0) return;
+            _eliteTroopIndex = (_eliteTroopIndex - 1 + _eliteTroops.Count) % _eliteTroops.Count;
+            EliteTroopName = _eliteTroops[_eliteTroopIndex].Name?.ToString() ?? "?";
+        }
+
+        public void ExecuteNextEliteTroop()
+        {
+            if (_eliteTroops.Count <= 0) return;
+            _eliteTroopIndex = (_eliteTroopIndex + 1) % _eliteTroops.Count;
+            EliteTroopName = _eliteTroops[_eliteTroopIndex].Name?.ToString() ?? "?";
+        }
+
+        private void RefreshEliteTroops(bool force = false)
+        {
+            if (!force && _eliteTroops.Count > 0) return; 
+            if (TaleWorlds.Core.Game.Current?.ObjectManager == null) return;
+
+            var allChars = TaleWorlds.Core.Game.Current.ObjectManager.GetObjectTypeList<CharacterObject>();
+            if (allChars == null) return;
+
+            string fac = _factions[_factionFilterIndex].ToLower();
+            string cls = _classes[_classFilterIndex].ToLower();
+            string tierStr = _tiers[_tierFilterIndex].ToLower();
+
+            _eliteTroops.Clear();
+
+            foreach (var t in allChars)
+            {
+                if (!t.IsSoldier || t.IsHero) continue;
+
+                // Faction check
+                if (fac != "any" && t.Culture?.StringId?.ToLower() != fac) continue;
+
+                // Tier check
+                int targetTier = -1;
+                if (tierStr != "any" && int.TryParse(tierStr.Replace("tier ", ""), out targetTier))
+                {
+                    if (t.Tier != targetTier) continue;
+                }
+
+                // Class check
+                if (cls != "any")
+                {
+                    bool isCav = t.HasMount();
+                    bool isRanged = t.IsRanged;
+                    
+                    if (cls == "infantry" && (isCav || isRanged)) continue;
+                    if (cls == "ranged" && (isCav || !isRanged)) continue;
+                    if (cls == "cavalry" && (!isCav || isRanged)) continue;
+                    if (cls == "horse archer" && (!isCav || !isRanged)) continue;
+                }
+
+                _eliteTroops.Add(t);
+            }
+
+            _eliteTroops = _eliteTroops
+                .OrderByDescending(t => t.Tier)
+                .ThenBy(t => t.Culture?.Name?.ToString() ?? "")
+                .ThenBy(t => t.Name?.ToString() ?? "")
+                .ToList();
+
+            if (_eliteTroops.Count > 0)
+            {
+                _eliteTroopIndex = 0;
+                EliteTroopName = _eliteTroops[_eliteTroopIndex].Name?.ToString() ?? "?";
+            }
+            else
+            {
+                EliteTroopName = "No Match Found";
+            }
+        }
+
+        public void ExecuteAddEliteTroops()
+        {
+            try
+            {
+                if (!int.TryParse(_addEliteTroopCountText, out int amt) || amt <= 0) amt = 50;
+                CharacterObject target = _eliteTroops.Count > 0 ? _eliteTroops[_eliteTroopIndex] : null;
+                _onStatusUpdate(PartyCheats.AddEliteTroops(amt, target));
+                RefreshDisplay();
+            }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecuteProvideUpgradeMounts()
+        {
+            try
+            {
+                _onStatusUpdate(PartyCheats.ProvideUpgradeMounts());
+                RefreshDisplay();
+            }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecuteAutoPromote()
+        {
+            try { _onStatusUpdate(PartyCheats.AutoPromote()); RefreshDisplay(); }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecuteRecruitPrisoners()
+        {
+            try { _onStatusUpdate(PartyCheats.RecruitPrisoners()); RefreshDisplay(); }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecuteMountHoarder()
+        {
+            try { _onStatusUpdate(PartyCheats.MountHoarder()); RefreshDisplay(); }
             catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
         }
     }
