@@ -61,12 +61,20 @@ namespace HeroHack.Cheats
 
         // ── Add Troops ─────────────────────────────────────────────────────
         /// <summary>Adds player-culture basic recruits up to the requested count (Bug 4, 5 fix).</summary>
-        public static string AddTroops(int count = 50)
+        public static string AddTroops(int count = 50, string targetCulture = null)
         {
             var party = MobileParty.MainParty;
             if (party == null) return "No active party.";
 
-            var troop = Hero.MainHero?.Culture?.BasicTroop;
+            CultureObject culture = null;
+            if (!string.IsNullOrEmpty(targetCulture))
+            {
+                culture = Game.Current?.ObjectManager?.GetObjectTypeList<CultureObject>()
+                    .FirstOrDefault(c => c.Name != null && c.Name.ToString().Contains(targetCulture));
+            }
+            if (culture == null) culture = Hero.MainHero?.Culture;
+
+            var troop = culture?.BasicTroop;
             if (troop == null) return "No basic troop available for this culture.";
 
             party.MemberRoster.AddToCounts(troop, count);

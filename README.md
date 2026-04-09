@@ -16,6 +16,7 @@ Press **F10** on the campaign map (or click the **HH** button in the top-right c
 | 5 | ✅ Done | XML Export / Import — full hero profile serialised to `Documents\HeroHack\exports\`. Covers identity, attributes, all 18 skills + focus, perks, traits, Battle/Stealth/Civilian equipment (all 12 slots each). Two-step import with confirm flow. |
 | 6 | ✅ Done | Polish — UI alignment overhauls, error handling, status messages, final QA. |
 | 7 | ✅ Done | Sprint A Expansion — Auto-promote injects XP into branching paths or resolves directly. Mount Hoarder fixes for herd-penalty validation. Advanced Custom Database Unit Spawner. Smart Upgrade Mount Provider calculates branching cavalry horse deficits exactly. |
+| 8 | ✅ Done | Basic Spawn Culture Selection — Row 3 now has a `< Culture >` cycler (Player / Empire / Vlandia / Battania / Khuzait / Aserai / Sturgia). `AddTroops` backend refactored to resolve `CultureObject` by name from `ObjectManager`, falling back to player culture. |
 
 ---
 

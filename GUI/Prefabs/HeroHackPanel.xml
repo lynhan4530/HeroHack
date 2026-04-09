@@ -428,20 +428,15 @@
                                        StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
                               <Children>
                                 <TextWidget Text="Add Troops:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="100" VerticalAlignment="Center" FontSize="15" />
-                                <EditableTextWidget Text="@AddTroopCountText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="85" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="4" Brush="Review.NameInput.Text" FontSize="14" />
-                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="30"
-                                              MarginLeft="15"
-                                              Command.Click="ExecuteAddTroops"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
-                                  <Children><TextWidget Text="Add Basic" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
-                                </ButtonWidget>
+                                <EditableTextWidget Text="@AddTroopCountText" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="65" SuggestedHeight="24" VerticalAlignment="Center" MaxLength="5" Brush="Review.NameInput.Text" FontSize="14" MarginRight="10" />
 
-                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="30"
-                                              MarginLeft="30"
-                                              Command.Click="ExecuteRecruitPrisoners"
-                                              DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
-                                  <Children><TextWidget Text="Mass Defect (Recruit Prisoners)" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
-                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" Command.Click="ExecutePrevBasicCulture" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+                                <TextWidget Text="@BasicCultureText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Color="#CFB53BFF" MarginLeft="5" MarginRight="5" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" Command.Click="ExecuteNextBasicCulture" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="110" SuggestedHeight="30" MarginLeft="15" Command.Click="ExecuteAddTroops" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="Add Basic" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="30" MarginLeft="15" Command.Click="ExecuteRecruitPrisoners" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="Mass Defect (Recruit Prisoners)" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
                               </Children>
                             </ListPanel>
 

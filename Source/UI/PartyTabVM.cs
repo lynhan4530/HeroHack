@@ -31,6 +31,9 @@ namespace HeroHack.UI
         private int _classFilterIndex = 0;
         private int _tierFilterIndex = 0;
         
+        private List<string> _basicCultures = new List<string> { "Player", "Empire", "Vlandia", "Battania", "Khuzait", "Aserai", "Sturgia" };
+        private int _basicCultureIndex = 0;
+        
         public PartyTabVM(Action<string> onStatusUpdate)
         {
             _onStatusUpdate = onStatusUpdate;
@@ -149,13 +152,21 @@ namespace HeroHack.UI
             catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
         }
 
-        // TODO: Need to have culture selection for basic spawn as well
+        [DataSourceProperty]
+        public string BasicCultureText => _basicCultures[_basicCultureIndex];
+
+        public void ExecutePrevBasicCulture() { _basicCultureIndex = (_basicCultureIndex - 1 + _basicCultures.Count) % _basicCultures.Count; OnPropertyChanged("BasicCultureText"); }
+        public void ExecuteNextBasicCulture() { _basicCultureIndex = (_basicCultureIndex + 1) % _basicCultures.Count; OnPropertyChanged("BasicCultureText"); }
+
+        // Culture selection implemented
         public void ExecuteAddTroops()
         {
             try
             {
                 if (!int.TryParse(_addTroopCountText, out int amt) || amt <= 0) amt = 50;
-                _onStatusUpdate(PartyCheats.AddTroops(amt));
+                string selectedCulture = _basicCultures[_basicCultureIndex];
+                string targetCulture = selectedCulture == "Player" ? null : selectedCulture;
+                _onStatusUpdate(PartyCheats.AddTroops(amt, targetCulture));
                 RefreshDisplay();
             }
             catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
