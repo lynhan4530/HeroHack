@@ -1,13 +1,23 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Siege;
 using TaleWorlds.Core;
 
 namespace HeroHack.Cheats
 {
     public static class PartyCheats
     {
+        // ── Sprint B: Harmony patch flags ─────────────────────────────────
+        /// <summary>Map speed multiplier (1 = vanilla). Read by SpeedMultiplierPatch.</summary>
+        public static float SpeedMultiplier { get; set; } = 1f;
+
+        /// <summary>Party size override floor (0 = disabled). Read by PartySizeOverridePatch.</summary>
+        public static int PartySizeOverride { get; set; } = 0;
+
         // ── Morale ─────────────────────────────────────────────────────────
         /// <summary>
         /// Adds +100 to recent-events morale. This decays naturally over days —
@@ -295,6 +305,61 @@ namespace HeroHack.Cheats
 
             party.ItemRoster.AddToCounts(simpleHorse, deficit);
             return $"Harvested {deficit}x {simpleHorse.Name} for optimal map speed.";
+        }
+
+        // ── Sprint C: Map Hacks ────────────────────────────────────────────
+
+        /// <summary>Instantly removes the Disorganized debuff from the player's party.</summary>
+        public static string RemoveDisorganized()
+        {
+            var party = MobileParty.MainParty;
+            if (party == null) return "No main party.";
+            if (!party.IsDisorganized) return "Party is not disorganized.";
+
+            // SetDisorganized may be non-public depending on game version — use reflection
+            var method = typeof(MobileParty).GetMethod("SetDisorganized",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                null, new[] { typeof(bool) }, null);
+            if (method == null) return "SetDisorganized not found (game version mismatch).";
+            method.Invoke(party, new object[] { false });
+            return "Disorganized debuff removed!";
+        }
+
+        /// <summary>Instantly completes siege camp preparation at the current siege.</summary>
+        public static string InstantSiege()
+        {
+            var party = MobileParty.MainParty;
+            if (party == null) return "No main party.";
+            var camp = party.BesiegerCamp;
+            if (camp == null) return "You are not currently besieging a settlement.";
+            try
+            {
+                // SiegeEngines.SiegePreparations is the camp build-up progress (public field + public SetProgress)
+                camp.SiegeEngines?.SiegePreparations?.SetProgress(1f);
+                return $"Siege preparation completed at {party.BesiegedSettlement?.Name}!";
+            }
+            catch (Exception ex)
+            {
+                return $"Instant siege failed: {ex.Message}";
+            }
+        }
+
+        /// <summary>Teleports the player's party to the target settlement instantly.</summary>
+        public static string TeleportToSettlement(Settlement? target)
+        {
+            var party = MobileParty.MainParty;
+            if (party == null) return "No main party.";
+            if (target == null) return "No settlement selected.";
+            try
+            {
+                // GatePosition is CampaignVec2 — same type as SetPositionAfterMapChange parameter
+                party.SetPositionAfterMapChange(target.GatePosition);
+                return $"Teleported to {target.Name}!";
+            }
+            catch (Exception ex)
+            {
+                return $"Teleport failed: {ex.Message}";
+            }
         }
 
         // ── Internal ───────────────────────────────────────────────────────

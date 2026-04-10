@@ -394,6 +394,46 @@
                               </Children>
                             </ListPanel>
 
+                            <!-- Row S1: Speed Multiplier -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="8">
+                              <Children>
+                                <TextWidget Text="Map Speed:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="90" VerticalAlignment="Center" FontSize="15" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" Command.Click="ExecuteSpeedDown" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+                                <TextWidget Text="@SpeedMultiplierText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="50" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" Color="#6BFF8FFF" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" Command.Click="ExecuteSpeedUp" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row S2: Party Size Override -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <TextWidget Text="Party Cap:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="90" VerticalAlignment="Center" FontSize="15" />
+                                <TextWidget Text="(base:" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="42" VerticalAlignment="Center" FontSize="13" Color="#888888FF" />
+                                <TextWidget Text="@ActualPartySizeCapText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="38" VerticalAlignment="Center" FontSize="13" Color="#CFB53BFF" />
+                                <TextWidget Text=")" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="10" VerticalAlignment="Center" FontSize="13" Color="#888888FF" MarginRight="8" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" Command.Click="ExecutePartySizeDown" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+                                <TextWidget Text="@PartySizeOverrideText" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="60" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" Color="#6BFF8FFF" />
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="28" Command.Click="ExecutePartySizeUp" DoNotPassEventsToChildren="true" Brush="ButtonBrush2"><Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children></ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
+                            <!-- Row C1: Remove Disorganized + Instant Siege -->
+                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
+                                       StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="30"
+                                              Command.Click="ExecuteRemoveDisorganized" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Remove Disorganized" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="180" SuggestedHeight="30"
+                                              MarginLeft="20" Command.Click="ExecuteInstantSiege" DoNotPassEventsToChildren="true" Brush="ButtonBrush2">
+                                  <Children><TextWidget Text="Instant Siege Prep" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" /></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+
                             <!-- Row 2: Add Food | Mount Hoarder | Mount Provider -->
                             <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="32"
                                        StackLayout.LayoutMethod="HorizontalLeftToRight" MarginBottom="12">

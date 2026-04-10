@@ -1,12 +1,17 @@
+using System;
+using System.IO;
 using System.Reflection;
 using HarmonyLib;
 using SandBox.View.Map;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
+using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ScreenSystem;
+using HeroHack.Cheats;
 using HeroHack.Patches;
 using HeroHack.UI;
 
@@ -27,8 +32,45 @@ namespace HeroHack
             base.OnSubModuleLoad();
             _harmony = new Harmony(HarmonyId);
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            // Sprint B: Manual patch registration with explicit error logging
+            try
+            {
+                SpeedMultiplierPatch.ApplyPatch(_harmony);
+                InformationManager.DisplayMessage(
+                    new InformationMessage("HeroHack: SpeedPatch OK", Color.FromUint(0xFF55FF55)));
+            }
+            catch (Exception ex)
+            {
+                LogPatchError("SpeedMultiplierPatch", ex);
+            }
+
+            try
+            {
+                PartySizeOverridePatch.ApplyPatch(_harmony);
+                InformationManager.DisplayMessage(
+                    new InformationMessage("HeroHack: PartySizePatch OK", Color.FromUint(0xFF55FF55)));
+            }
+            catch (Exception ex)
+            {
+                LogPatchError("PartySizeOverridePatch", ex);
+            }
+
             InformationManager.DisplayMessage(
                 new InformationMessage("HeroHack: Initialized", Color.FromUint(0xFF55FF55)));
+        }
+
+        private static void LogPatchError(string patchName, Exception ex)
+        {
+            string logPath = System.IO.Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments),
+                "HeroHack", "patch_errors.txt");
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath)!);
+            System.IO.File.AppendAllText(logPath,
+                $"[{System.DateTime.Now}] {patchName} FAILED: {ex}\n\n");
+            InformationManager.DisplayMessage(
+                new InformationMessage($"HeroHack: {patchName} failed - check Documents/HeroHack/patch_errors.txt",
+                Color.FromUint(0xFFFF5555)));
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)

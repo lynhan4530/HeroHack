@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using HeroHack.Cheats;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
 
 namespace HeroHack.UI
@@ -34,6 +35,11 @@ namespace HeroHack.UI
         private List<string> _basicCultures = new List<string> { "Player", "Empire", "Vlandia", "Battania", "Khuzait", "Aserai", "Sturgia" };
         private int _basicCultureIndex = 0;
         
+        // ── Sprint B: Slider state ───────────────────────────────────
+        private int _speedMultiplierInt = 1;   // 1..50
+        private int _partySizeOverrideInt = 0; // 0 = not yet initialised; set from actual limit
+        private string _actualPartySizeCapText = "--";
+
         public PartyTabVM(Action<string> onStatusUpdate)
         {
             _onStatusUpdate = onStatusUpdate;
@@ -102,6 +108,51 @@ namespace HeroHack.UI
         [DataSourceProperty] public string ClassFilterText => _classes[_classFilterIndex];
         [DataSourceProperty] public string TierFilterText => _tiers[_tierFilterIndex];
 
+        // ── Sprint B slider properties ────────────────────────────────────
+        [DataSourceProperty]
+        public string SpeedMultiplierText
+        {
+            get => $"{_speedMultiplierInt}x";
+        }
+
+        [DataSourceProperty]
+        public string PartySizeOverrideText
+        {
+            get => _partySizeOverrideInt > 0 ? _partySizeOverrideInt.ToString() : "--";
+        }
+
+        [DataSourceProperty]
+        public string ActualPartySizeCapText
+        {
+            get => _actualPartySizeCapText;
+            set { if (_actualPartySizeCapText != value) { _actualPartySizeCapText = value; OnPropertyChangedWithValue(value, nameof(ActualPartySizeCapText)); } }
+        }
+
+        public void ExecuteSpeedDown()
+        {
+            _speedMultiplierInt = System.Math.Max(1, _speedMultiplierInt - 1);
+            PartyCheats.SpeedMultiplier = _speedMultiplierInt;
+            OnPropertyChanged(nameof(SpeedMultiplierText));
+        }
+        public void ExecuteSpeedUp()
+        {
+            _speedMultiplierInt = System.Math.Min(50, _speedMultiplierInt + 1);
+            PartyCheats.SpeedMultiplier = _speedMultiplierInt;
+            OnPropertyChanged(nameof(SpeedMultiplierText));
+        }
+        public void ExecutePartySizeDown()
+        {
+            if (_partySizeOverrideInt > 1) { _partySizeOverrideInt -= 10; if (_partySizeOverrideInt < 1) _partySizeOverrideInt = 1; }
+            PartyCheats.PartySizeOverride = _partySizeOverrideInt;
+            OnPropertyChanged(nameof(PartySizeOverrideText));
+        }
+        public void ExecutePartySizeUp()
+        {
+            _partySizeOverrideInt = System.Math.Min(9999, _partySizeOverrideInt + 10);
+            PartyCheats.PartySizeOverride = _partySizeOverrideInt;
+            OnPropertyChanged(nameof(PartySizeOverrideText));
+        }
+
         // ── Refresh ────────────────────────────────────────────────────────
 
         // Bug 9: called from HeroHackPanelVM.ExecuteSelectTab1() so display is always fresh
@@ -120,6 +171,17 @@ namespace HeroHack.UI
                 FoodText      = ((int)party.Food).ToString();
                 WoundedText   = party.MemberRoster.TotalWounded.ToString();
                 PartySizeText = party.MemberRoster.TotalManCount.ToString();
+
+                // Display the live vanilla party limit
+                int actualCap = party.Party?.PartySizeLimit ?? 0;
+                ActualPartySizeCapText = actualCap.ToString();
+                // Initialise the override slider to the actual limit if it hasn't been set yet
+                if (_partySizeOverrideInt == 0 && actualCap > 0)
+                {
+                    _partySizeOverrideInt = actualCap;
+                    PartyCheats.PartySizeOverride = actualCap;
+                    OnPropertyChanged(nameof(PartySizeOverrideText));
+                }
             }
             catch (Exception ex)
             {
@@ -292,6 +354,20 @@ namespace HeroHack.UI
         public void ExecuteMountHoarder()
         {
             try { _onStatusUpdate(PartyCheats.MountHoarder()); RefreshDisplay(); }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        // ── Sprint C: Execute methods ─────────────────────────────────────
+
+        public void ExecuteRemoveDisorganized()
+        {
+            try { _onStatusUpdate(PartyCheats.RemoveDisorganized()); RefreshDisplay(); }
+            catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
+        }
+
+        public void ExecuteInstantSiege()
+        {
+            try { _onStatusUpdate(PartyCheats.InstantSiege()); }
             catch (Exception ex) { _onStatusUpdate($"Error: {ex.Message}"); }
         }
     }
