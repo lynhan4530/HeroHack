@@ -29,3 +29,6 @@ test_*.exe
 xml_error.txt
 AGENT_HANDOFF.md
 SPRINT_C_*.md
+log.txt
+build_output.log
+herophack_copilot_prompt.md
