@@ -20,3 +20,12 @@ Newtonsoft.Json.dll
 # OS files
 Thumbs.db
 .DS_Store
+
+# Scratch / dev-session files
+reflect_*.cs
+reflect_*.ps1
+test_*.cs
+test_*.exe
+xml_error.txt
+AGENT_HANDOFF.md
+SPRINT_C_*.md
